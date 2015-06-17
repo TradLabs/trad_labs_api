@@ -12,5 +12,6 @@ class OtherItems(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
 
 
+# Allows to file to be run directly
 if __name__ == '__main__':
     unittest.main()
