@@ -2,7 +2,7 @@ __author__ = 'sfblackl'
 
 import unittest
 
-from app import application
+from flaskApp.app import application
 
 
 class OtherItems(unittest.TestCase):
