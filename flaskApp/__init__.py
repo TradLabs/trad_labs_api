@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # pylint: disable=C0103
 # pylint: disable=R0401
 

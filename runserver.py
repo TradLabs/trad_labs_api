@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 """Used to launch flask application from outside module"""
 __author__ = 'sfblackl'
 

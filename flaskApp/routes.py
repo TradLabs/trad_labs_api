@@ -1,4 +1,4 @@
-#!flask/bin/python
+#!/usr/bin/python3
 # pylint: disable=R0401
 
 """Maps all incoming paths to correct functions to handle"""
@@ -9,9 +9,9 @@ def health():
     """Health Check Function used by ELB and SLA Monitoring"""
     return "OK"
 
-####################################################################################
+################################################################################
 # TESTING
-####################################################################################
+################################################################################
 @application.route('/tradlabs/v1/500', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def test_500():
     """Forces error to validate error message is correct"""
