@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# pylint: disable=unused-import
 
 """Maps all incoming paths to correct functions to handle"""
 from flaskApp import application, custom_errors
@@ -21,4 +20,4 @@ def test_500():
 @application.route('/tradlabs/v1/403', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def test_403():
     """Generates 403 Error.  ToDo: Replace this with valid test"""
-    return custom_errors.error_formatter(code=403)
+    return custom_errors.error_formatter(code=40301)

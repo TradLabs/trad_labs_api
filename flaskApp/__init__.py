@@ -1,6 +1,5 @@
 #!/usr/bin/python3
-# pylint: disable=C0103
-# pylint: disable=R0401
+# pylint: disable=invalid-name
 
 """Creates Module"""
 __author__ = 'sfblackl'

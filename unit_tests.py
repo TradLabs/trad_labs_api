@@ -18,6 +18,13 @@ class OtherItems(unittest.TestCase):
             response = tc1.get('/tradlabs/v1/health')
             self.assertEqual(response.status_code, 200)
 
+    def test_403(self):
+        """Ensure un trapped error correctly reports out status and code"""
+        with application.test_client(self) as tc1:
+            response = tc1.get('/tradlabs/v1/403')
+            self.assertEqual(response.status_code, 403)
+            self.assertEqual(json.loads(response.data)['code'], 'TLA-40301')
+
     def test_404(self):
         """Ensure un trapped error correctly reports out status and code"""
         with application.test_client(self) as tc1:

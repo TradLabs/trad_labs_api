@@ -11,6 +11,7 @@ from . import application
 # ERROR MESSAGES
 ################################################################################
 ERROR_MESSAGES = {40001: 'Invalid request: unspecified item.',
+                  40301: 'Forbidden: Your credentials do not have access to the resource.',
                   40401: 'Not Found: The resource (%s) you requested could not be found.',
                   50001: 'Internal server error(1)',    # General
                   50002: 'Internal server error(2)',    # Service
