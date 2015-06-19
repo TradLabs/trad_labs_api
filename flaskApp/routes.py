@@ -1,8 +1,9 @@
 #!/usr/bin/python3
-# pylint: disable=R0401
+# pylint: disable=unused-import
 
 """Maps all incoming paths to correct functions to handle"""
 from flaskApp import application
+
 
 @application.route('/tradlabs/v1/health')
 def health():
