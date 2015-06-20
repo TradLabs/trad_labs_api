@@ -9,6 +9,28 @@ from flask import json
 from flaskApp import application
 
 
+################################################################################
+# SetUp Logging
+################################################################################
+import logging
+import logging.handlers
+LOGGER = logging.getLogger('tradlabs')
+LOGGER.setLevel(logging.INFO)
+
+# File Handler
+H_FILE = logging.handlers.TimedRotatingFileHandler('C:\\TEMP\\api.log',
+                                                   when='midnight', backupCount=5)
+H_CONSOLE = logging.StreamHandler()
+
+FORMATTER = logging.Formatter('%(asctime)s - %(lineno)3d:%(module)-10s-'
+                              ' %(levelname)-8s- %(message)s')
+H_FILE.setFormatter(FORMATTER)
+H_CONSOLE.setFormatter(FORMATTER)
+
+LOGGER.addHandler(H_FILE)
+LOGGER.addHandler(H_CONSOLE)
+
+
 class OtherItems(unittest.TestCase):
     """Universal Unit Tests for REST Service"""
 
