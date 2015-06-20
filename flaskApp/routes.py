@@ -73,7 +73,11 @@ def http_log_entry(response=None, exception=None):
 def before_request():
     """Sets up actions before request starts.  Used for Logging"""
     g.start = time.time()
-    g.request_id = uuid.uuid1()
+    g.env = config.ENV
+
+    # Use incoming Request ID if provided
+    request_id = request.headers.get('X_Request_ID', uuid.uuid1())
+    g.request_id = request_id
 
 @application.after_request
 def after_request(response):
