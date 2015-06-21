@@ -6,6 +6,7 @@ __author__ = 'sfblackl'
 # SetUp Logging
 ################################################################################
 import logging
+
 import logging.handlers
 
 import flaskApp.loggly_class
@@ -18,7 +19,7 @@ def start_log(loggly=True):
     logger.setLevel(flaskApp.config.LOG_LEVEL_TOP)
 
     # File Handler
-    h_file = logging.handlers.TimedRotatingFileHandler('C:\\TEMP\\api.log',
+    h_file = logging.handlers.TimedRotatingFileHandler(flaskApp.config.LOG_PATH + 'api.log',
                                                        when='midnight', backupCount=5)
     h_console = logging.StreamHandler()
 
