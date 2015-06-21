@@ -2,20 +2,17 @@
 """Configuration of Applications - All Environments"""
 __author__ = 'sfblackl'
 import os
-import traceback
-import sys
 import logging
 
 from flaskApp.env import START_ENV
 
+
+################################################################################
+# If CI hasn't changed to specific env, use OS Env Variables to get it
+################################################################################
 if START_ENV == 'tbd':
     ENV = START_ENV
-    try:
-        ENV = os.environ['trad_labs_api_env']
-    except Exception:
-        print("Error getting environment variable: %s" %
-              traceback.format_exception_only(sys.exc_info()[0], sys.exc_info()[1]))
-
+    ENV = os.getenv('trad_labs_api_env', START_ENV)
 
 # Default items
 # Log Levels

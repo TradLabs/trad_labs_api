@@ -13,6 +13,7 @@ import flaskApp.config
 
 
 def start_log(loggly=True):
+    """Starts Logging to Occur"""
     logger = logging.getLogger('tradlabs')
     logger.setLevel(flaskApp.config.LOG_LEVEL_TOP)
 
