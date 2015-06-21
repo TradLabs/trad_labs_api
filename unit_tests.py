@@ -20,6 +20,21 @@ class OtherItems(unittest.TestCase):
             response = tc1.get('/tradlabs/v1/health')
             self.assertEqual(response.status_code, 200)
             self.assertEqual(flask.json.loads(response.data)['currentSetting'], 'ci')
+            self.assertEqual(flask.json.loads(response.data)['detail'], 'app_pool')
+
+    def test_health_bad_detail(self):
+        """Validation that bad detail_level handled correctly"""
+        with application.test_client(self) as tc1:
+            response = tc1.get('/tradlabs/v1/health?detail_level=blah')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(flask.json.loads(response.data)['detail'], 'app_pool')
+
+    def test_health_sla(self):
+        """Happy Path test of health check sla"""
+        with application.test_client(self) as tc1:
+            response = tc1.get('/tradlabs/v1/health?detail_level=sla')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(flask.json.loads(response.data)['detail'], 'sla')
 
     def test_403(self):
         """Ensure un trapped error correctly reports out status and code"""
