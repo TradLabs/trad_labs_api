@@ -6,10 +6,8 @@ __author__ = 'sfblackl'
 import logging
 import logging.handlers
 import socket
-import traceback
 
 from flask import g, request
-
 from requests_futures.sessions import FuturesSession
 
 SESSION = FuturesSession()
@@ -19,12 +17,12 @@ def bg_cb(sess, resp):
     """ Don't do anything with the response """
     pass
 
-def get_full_message(record):
-    """ Unused """
-    if record.exc_info:
-        return '\n'.join(traceback.format_exception(*record.exc_info))
-    else:
-        return record.getMessage()
+# def get_full_message(record):
+#     """ Unused """
+#     if record.exc_info:
+#         return '\n'.join(traceback.format_exception(*record.exc_info))
+#     else:
+#         return record.getMessage()
 
 def generate_header():
     """ Creates custom tags to go over header """
