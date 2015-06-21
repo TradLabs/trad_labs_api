@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """health check functions"""
 __author__ = 'sfblackl'
+
 import logging
 
 from flask import request, jsonify

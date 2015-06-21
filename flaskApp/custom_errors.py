@@ -4,7 +4,7 @@ __author__ = 'sfblackl'
 
 from flask import jsonify, request
 
-from . import application
+from flaskApp import application
 
 
 ################################################################################
