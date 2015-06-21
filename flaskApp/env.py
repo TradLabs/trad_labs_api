@@ -2,4 +2,4 @@
 """Specifies the environment.  CI will update with correct version"""
 __author__ = 'sfblackl'
 
-ENVIRONMENT = 'dev'
+START_ENV = 'tbd'

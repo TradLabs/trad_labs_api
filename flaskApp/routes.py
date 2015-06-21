@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-
 """Maps all incoming paths to correct functions to handle"""
 import logging
 import time
@@ -7,12 +6,15 @@ import uuid
 
 from flask import g, request
 
-from flaskApp import application, custom_errors, config
+from flaskApp import application
+import flaskApp.health
+import flaskApp.config
+import flaskApp.custom_errors
 
 
 # Create Logger
 LOGGER = logging.getLogger('tradlabs.api.routes')
-LOGGER.setLevel(config.LOG_LEVEL_ROUTE)
+LOGGER.setLevel(flaskApp.config.LOG_LEVEL_ROUTE)
 
 
 ################################################################################
@@ -22,7 +24,7 @@ LOGGER.setLevel(config.LOG_LEVEL_ROUTE)
 def health():
     """Health Check Function used by ELB and SLA Monitoring"""
     LOGGER.debug('Routing to health')
-    return "OK"
+    return flaskApp.health.health_check()
 
 ################################################################################
 # TESTING
@@ -37,7 +39,7 @@ def test_500():
 def test_403():
     """Generates 403 Error.  ToDo: Replace this with valid test"""
     LOGGER.debug('Routing to HTTP 403 Error')
-    return custom_errors.error_formatter(code=40301)
+    return flaskApp.custom_errors.error_formatter(code=40301)
 
 ################################################################################
 # LOG HTTP REQUESTS
@@ -73,7 +75,7 @@ def http_log_entry(response=None, exception=None):
 def before_request():
     """Sets up actions before request starts.  Used for Logging"""
     g.start = time.time()
-    g.env = config.ENV
+    g.env = flaskApp.config.ENV
 
     # Use incoming Request ID if provided
     request_id = request.headers.get('X_Request_ID', uuid.uuid1())

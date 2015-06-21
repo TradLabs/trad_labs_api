@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """Collection of Unit Tests for Application """
-# __author__ = 'sfblackl'
+__author__ = 'sfblackl'
 
 import unittest
 
@@ -19,6 +19,7 @@ class OtherItems(unittest.TestCase):
         with application.test_client(self) as tc1:
             response = tc1.get('/tradlabs/v1/health')
             self.assertEqual(response.status_code, 200)
+            self.assertEqual(flask.json.loads(response.data)['currentSetting'], 'dev1')
 
     def test_403(self):
         """Ensure un trapped error correctly reports out status and code"""
