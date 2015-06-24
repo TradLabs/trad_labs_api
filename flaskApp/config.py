@@ -12,6 +12,7 @@ from flaskApp.env import START_ENV
 
 
 
+
 ################################################################################
 # If CI hasn't changed to specific env, use OS Env Variables to get it
 ################################################################################
@@ -30,7 +31,7 @@ LOG_PATH = 'C:\\temp\\'
 if ENV == 'ci':
     LOG_PATH = ''
 elif ENV == 'qa1':
-    LOG_PATH = '/var/log/'
+    LOG_PATH = '/var/log/trad_labs'
 
 
 # Loggy Location
