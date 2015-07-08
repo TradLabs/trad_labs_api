@@ -13,6 +13,8 @@ import time
 import socket
 
 import flask.json
+from flask import g
+
 
 
 
@@ -22,6 +24,7 @@ import flaskApp.config
 # Specific Items
 import mysql.connector
 import mysql.connector.errorcode
+import mysql.connector.pooling
 
 # Create Logger
 LOGGER = logging.getLogger('tradlabs.api.db')
@@ -90,6 +93,14 @@ def db_tests():
     db_query("update health set system='tbd' where system='not tbd'", ())
     success_count += 1
 
+    # D. Long Query
+    db_query("select sleep(6);", ())
+    success_count += 1
+
+    # III. Test SP
+    # B. SP Not exist
+    db_stored_procedure('health_check', ('unit test', 43))
+
     return "%d" % success_count
 
 
@@ -149,7 +160,7 @@ def db_stored_procedure(procedure_name, args):
     end_time = time.time()
     delta_time = datetime.timedelta(seconds=(end_time - start_time))
 
-    if delta_time.total_seconds() > float(10.0):
+    if delta_time.total_seconds() > float(5.0):
         LOGGER.warning("Stored Procedure Complete. | Elapsed Time: %s | Called: %s",
                        str(delta_time), procedure_statement)
     else:
@@ -202,7 +213,7 @@ def db_query(query_call, args):
     end_time = time.time()
     delta_time = datetime.timedelta(seconds=(end_time - start_time))
 
-    if delta_time.total_seconds() > float(10.0):
+    if delta_time.total_seconds() > float(5.0):
         LOGGER.warning("Query Complete. | Elapsed Time: %s | Called: %s",
                        str(delta_time), statement)
     else:
@@ -237,14 +248,19 @@ def db_connection():
 
     # II. Create New Connection
     try:
-        connection = mysql.connector.connect(host=host,
-                                             port=port,
-                                             user=user,
-                                             password=password,
-                                             db=db_name,
-                                             connection_timeout=2)
-        connection.autocommit = True
-        connection.raise_on_warnings = True
+        db_pool = getattr(g, 'db_pool', None)
+        if db_pool is None:
+            db_pool = mysql.connector.pooling.MySQLConnectionPool(host=host,
+                                                                  port=port,
+                                                                  user=user,
+                                                                  password=password,
+                                                                  db=db_name,
+                                                                  connection_timeout=15,
+                                                                  pool_name='trad_labs_api',
+                                                                  autocommit=True,
+                                                                  raise_on_warnings=True)
+            g.db_pool = db_pool
+        connection = g.db_pool.get_connection()
 
     except mysql.connector.Error as err:
         if err.errno == mysql.connector.errorcode.ER_ACCESS_DENIED_ERROR:
