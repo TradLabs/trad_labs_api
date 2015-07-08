@@ -18,6 +18,7 @@ import flaskApp.db
 LOGGER = logging.getLogger('tradlabs.api.health')
 LOGGER.setLevel(flaskApp.config.LOG_LEVEL_HEALTH)
 
+
 def health_check():
     """ Performs health check based on HTTP arguments
 

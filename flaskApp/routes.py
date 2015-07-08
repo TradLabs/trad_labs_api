@@ -7,7 +7,6 @@ import time
 import uuid
 import traceback
 import sys
-import socket
 
 from flask import g, request, render_template, url_for
 
@@ -24,6 +23,7 @@ import flaskApp.db
 LOGGER = logging.getLogger('tradlabs.api.routes')
 LOGGER.setLevel(flaskApp.config.LOG_LEVEL_ROUTE)
 
+
 ################################################################################
 # WWW
 ################################################################################
@@ -34,6 +34,7 @@ def home():
     page = render_template('home.html', login_uri=login_uri)
     return page
 
+
 ################################################################################
 # Identity
 ################################################################################
@@ -41,6 +42,7 @@ def home():
 def google_login():
     """Build redirect request to identity provider"""
     return flaskApp.google.google_login()
+
 
 @application.route('/tradlabs/v1/google_callback')
 def google_callback():
@@ -58,6 +60,7 @@ def health():
     LOGGER.debug('Routing to health')
     return flaskApp.health.health_check()
 
+
 ################################################################################
 # TESTING
 ################################################################################
@@ -67,20 +70,22 @@ def test_500():
     LOGGER.debug('Routing to HTTP 500 Error')
     print(1/0)
 
+
 @application.route('/tradlabs/v1/403', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def test_403():
     """Generates 403 Error.  ToDo: Replace this with valid test"""
     LOGGER.debug('Routing to HTTP 403 Error')
     return flaskApp.custom_errors.error_formatter(code='403')
 
+
 @application.route('/tradlabs/v1/test/db', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def test_db():
-    """Basic Test of DB Query since we don't yet have this working."""
-    LOGGER.debug('Implementing DB Test')
-    host = socket.gethostname().lower()
-    db_count = flaskApp.db.db_query("select count(*) from health where system=%s", (host,))[0][0]
+    """Test of various DB Functions"""
+    LOGGER.debug('Routing to DB Test')
 
-    return str(db_count)
+    return flaskApp.db.db_tests()
+
+
 ################################################################################
 # LOG HTTP REQUESTS
 ################################################################################
@@ -91,7 +96,7 @@ def http_log_entry(response=None, exception=None):
     start = getattr(g, 'start', None)
     diff = 0
     if start is not None:
-        diff = int((time.time() - g.start) * 1000) # Gets time in MS
+        diff = int((time.time() - g.start) * 1000)  # Gets time in MS
 
     # Determine HTTP Status, Code
     # If we come without a response object, default to HTTP 520
@@ -122,11 +127,13 @@ def before_request():
     request_id = str(request.headers.get('X_Request_ID', uuid.uuid1()))
     g.request_id = request_id
 
+
 @application.after_request
 def after_request(response):
     """Logs a non-exception request"""
     http_log_entry(response=response)
     return response
+
 
 @application.teardown_request
 def teardown_request(exception=None):

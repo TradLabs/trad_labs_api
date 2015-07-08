@@ -10,6 +10,7 @@ import os
 import logging
 import datetime
 import time
+import socket
 
 import flask.json
 
@@ -38,6 +39,58 @@ def if_null(var, val):
     if var is None:
         return val
     return var
+
+
+def db_tests():
+    """ Used to test all DB functions for full code coverage
+
+    :return: Display Data
+    """
+    success_count = 0
+    host = socket.gethostname().lower()
+
+    # I. Test Utility
+    # A. Valid If Null
+    if if_null(None, 'other') == 'other':
+        success_count += 1
+    # else:
+    #     LOGGER.error('IF 1 Failed')
+
+    if if_null('Not Other', 'other') != 'other':
+        success_count += 1
+    # else:
+    #     LOGGER.error('IF 2 Failed')
+
+    # B. Format Query / SP
+    if format_statement('sp', (1, 1.5, True, 'String'), True) == "call sp(1,1.5,True,'String');":
+        success_count += 1
+    # else:
+    #     LOGGER.error('Format Failed, was: %s', format_statement('sp', (1, 1.5, True, 'String'), True))
+
+    if format_statement("select * from health where app='%s' and system='%s'", ('unit test', 'my pc'), False) == \
+            "select * from health where app='unit test' and system='my pc';":
+        success_count += 1
+    # else:
+    #     LOGGER.error('Format Failed, was: %s', format_statement("select * from health where app='%s' and system='%s'",
+    #                                                             ('unit test', 'my pc'), False))
+
+    # II. Test Query
+    # A. Basic Query
+    db_count = db_query("select count(*) from health where app=%s", ('does not exist',))[0][0]
+    if db_count == 0:
+        success_count += 1
+
+    # B. Bad Query
+    try:
+        db_query("select count(*) from health2 where app=%s", ('does not exist',))[0][0]
+    except Exception:
+        success_count += 1
+
+    # C. No Result Query
+    db_query("update health set system='tbd' where system='not tbd'", ())
+    success_count += 1
+
+    return "%d" % success_count
 
 
 def db_stored_procedure(procedure_name, args):
@@ -130,7 +183,7 @@ def db_query(query_call, args):
         raise
 
     except Exception:
-        LOGGER.error("DB Error: %s with statement: %s",
+        LOGGER.error("Unknown DB Error: %s with statement: %s",
                      traceback.format_exception_only(sys.exc_info()[0], sys.exc_info()[1]), statement)
         connection.close()
         raise
@@ -243,6 +296,6 @@ def format_statement(statement, args, sp_indicator):
             raise
 
     else:
-        procedure_statement = 'exec ' + statement % args
+        procedure_statement = statement % args + ';'
 
     return procedure_statement
