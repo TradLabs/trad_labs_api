@@ -59,7 +59,7 @@ class OtherItems(unittest.TestCase):
 
 class Random(unittest.TestCase):
     """
-        Test the DB to hell
+        Test the DB to hell.  Ok, limited amounts
     """
 
     def test_db_query(self):
