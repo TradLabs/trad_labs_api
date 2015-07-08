@@ -13,7 +13,6 @@ import flaskApp.config
 import flaskApp.db
 
 
-
 # Create Logger
 LOGGER = logging.getLogger('tradlabs.api.health')
 LOGGER.setLevel(flaskApp.config.LOG_LEVEL_HEALTH)

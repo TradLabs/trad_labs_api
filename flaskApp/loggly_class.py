@@ -13,6 +13,7 @@ from requests_futures.sessions import FuturesSession
 SESSION = FuturesSession()
 
 
+# noinspection PyUnusedLocal,PyUnusedLocal
 def bg_cb(sess, resp):
     """ Don't do anything with the response """
     pass
@@ -32,7 +33,7 @@ def generate_header():
 
 
 class HTTPSHandler(logging.Handler):
-    """ Stolen from Loggy's default class """
+    """ Stolen from Loggly's default class """
     def __init__(self, url, fqdn=False, localname=None, facility=None):
         """ Initialize """
         logging.Handler.__init__(self)

@@ -9,12 +9,10 @@ import logging
 
 from flask import redirect, request, url_for
 from oauth2client import client
-
 import requests
 
 import flaskApp.config
 import flaskApp.custom_errors
-
 
 
 # Create Logger

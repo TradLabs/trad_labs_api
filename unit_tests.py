@@ -11,6 +11,7 @@ import log_setup
 
 log_setup.start_log()
 
+
 class OtherItems(unittest.TestCase):
     """Universal Unit Tests for REST Service"""
 
@@ -56,6 +57,7 @@ class OtherItems(unittest.TestCase):
             response = tc1.get('/tradlabs/v1/500')
             self.assertEqual(response.status_code, 500)
             self.assertEqual(flask.json.loads(response.data)['code'], '500_01')
+
 
 class Random(unittest.TestCase):
     """

@@ -11,5 +11,5 @@ log_setup.start_log()
 from flaskApp import application
 
 if __name__ == '__main__':
-    #application.template_folder = 'flaskApp/templates'
+    """Starts the App"""
     application.run()

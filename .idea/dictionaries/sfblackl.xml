@@ -1,11 +1,33 @@
 <component name="ProjectDictionaryState">
   <dictionary name="sfblackl">
     <words>
+      <w>asctime</w>
+      <w>betarat</w>
+      <w>chdir</w>
+      <w>fqdn</w>
+      <w>htmlcov</w>
+      <w>imageloader</w>
+      <w>levelname</w>
+      <w>lineno</w>
+      <w>localname</w>
       <w>loggly</w>
+      <w>loggly's</w>
+      <w>nginx</w>
       <w>nosetests</w>
+      <w>opengraphprotocol</w>
+      <w>pycache</w>
       <w>pylint</w>
+      <w>rollups</w>
+      <w>runlevel</w>
+      <w>setgid</w>
+      <w>setuid</w>
       <w>sfblackl</w>
+      <w>sitecss</w>
+      <w>squarespace</w>
+      <w>tmlcov/</w>
       <w>tradlabs</w>
+      <w>uwsgi</w>
+      <w>wsgi</w>
     </words>
   </dictionary>
 </component>

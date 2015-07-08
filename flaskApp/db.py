@@ -10,12 +10,9 @@ import os
 import logging
 import datetime
 import time
-import socket
 
 import flask.json
 from flask import g
-
-
 
 
 # Import our common code
@@ -34,7 +31,7 @@ LOGGER.setLevel(flaskApp.config.LOG_LEVEL_DB)
 def if_null(var, val):
     """ Quick function to ensure Nulls don't cause problems with string concat
 
-    :param var: Variable to be evaluted for null
+    :param var: Variable to be evaluated for null
     :param val: replacement value if null
     :return: variable
     """
@@ -50,9 +47,10 @@ def db_tests():
     :return: Display Data
     """
     success_count = 0
-    host = socket.gethostname().lower()
 
+    # ###################################################################################################
     # I. Test Utility
+    # ###################################################################################################
     # A. Valid If Null
     if if_null(None, 'other') == 'other':
         success_count += 1
@@ -65,19 +63,48 @@ def db_tests():
     #     LOGGER.error('IF 2 Failed')
 
     # B. Format Query / SP
-    if format_statement('sp', (1, 1.5, True, 'String'), True) == "call sp(1,1.5,True,'String');":
+    tmp = format_statement('sp', (1, 1.5, True, 'String', None), True)
+    if tmp == "call sp(1,1.5,True,'String',NULL);":
         success_count += 1
     # else:
-    #     LOGGER.error('Format Failed, was: %s', format_statement('sp', (1, 1.5, True, 'String'), True))
+    #     LOGGER.error('Format Failed, was: %s', tmp)
 
-    if format_statement("select * from health where app='%s' and system='%s'", ('unit test', 'my pc'), False) == \
-            "select * from health where app='unit test' and system='my pc';":
+    tmp = format_statement("select * from health where app='%s' and system='%s'", ('unit test', 'my pc'), False)
+    if tmp == "select * from health where app='unit test' and system='my pc';":
         success_count += 1
     # else:
-    #     LOGGER.error('Format Failed, was: %s', format_statement("select * from health where app='%s' and system='%s'",
-    #                                                             ('unit test', 'my pc'), False))
+    #     LOGGER.error('Format Failed, was: %s', tmp)
 
-    # II. Test Query
+    # ###################################################################################################
+    # II. Connection Bad
+    # ###################################################################################################
+    # A. Bad Config
+    try:
+        db_connection(db_test='bad_config')
+    except Exception:
+        success_count += 1
+
+    # B. Bad Password
+    try:
+        db_connection(db_test='bad_password')
+    except Exception:
+        success_count += 1
+
+    # C. Bad DB
+    try:
+        db_connection(db_test='bad_db')
+    except Exception:
+        success_count += 1
+
+    # D. Bad Port
+    try:
+        db_connection(db_test='bad_port')
+    except Exception:
+        success_count += 1
+
+    # ###################################################################################################
+    # III. Test Query
+    # ###################################################################################################
     # A. Basic Query
     db_count = db_query("select count(*) from health where app=%s", ('does not exist',))[0][0]
     if db_count == 0:
@@ -223,7 +250,7 @@ def db_query(query_call, args):
     return return_results
 
 
-def db_connection():
+def db_connection(db_test=None):
     """ Creates mySQL DB Connection Object
     :return: mySQL connection object
     """
@@ -235,6 +262,11 @@ def db_connection():
         # DB
         db_info = os.getenv('trad_labs_api_db',
                             '{"host":"hostname","port":3306,"user":"username","password":"password","db_name":"db"}')
+
+        # Override to get bad JSON to force error
+        if db_test == 'bad_config':
+            db_info = '{host:"hostname","port":3306,"user":"username","password":"password","db_name":"db"}'
+
         host = flask.json.loads(db_info)['host']
         port = flask.json.loads(db_info)['port']
         user = flask.json.loads(db_info)['user']
@@ -250,6 +282,13 @@ def db_connection():
     try:
         db_pool = getattr(g, 'db_pool', None)
         if db_pool is None:
+            # Allow testing of bad situations
+            if db_test == 'bad_password':
+                password = 'password'
+
+            if db_test == 'bad_db':
+                db_name = 'no exist'
+
             db_pool = mysql.connector.pooling.MySQLConnectionPool(host=host,
                                                                   port=port,
                                                                   user=user,
@@ -266,9 +305,6 @@ def db_connection():
         if err.errno == mysql.connector.errorcode.ER_ACCESS_DENIED_ERROR:
             LOGGER.critical("DB Connection to %s:%s, db=%s failed for user %s due to user/pwd being incorrect",
                             host, port, db_name, user)
-        elif err.errno == mysql.connector.errorcode.ER_BAD_DB_ERROR:
-            LOGGER.critical("DB Connection to %s:%s, db=%s failed as db does not exist",
-                            host, port, db_name)
         else:
             LOGGER.critical("DB Connection to %s:%s, db=%s failed for user %s due to %s",
                             host, port, db_name, user, err)

@@ -18,7 +18,6 @@ import flaskApp.google
 import flaskApp.db
 
 
-
 # Create Logger
 LOGGER = logging.getLogger('tradlabs.api.routes')
 LOGGER.setLevel(flaskApp.config.LOG_LEVEL_ROUTE)
