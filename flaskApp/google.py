@@ -8,11 +8,13 @@ import os
 import logging
 
 from flask import redirect, request, url_for
+import flask.json
 from oauth2client import client
 import requests
 
 import flaskApp.config
 import flaskApp.custom_errors
+
 
 
 
@@ -23,15 +25,26 @@ LOGGER.setLevel(flaskApp.config.LOG_LEVEL_GOOGLE)
 
 def google_flow():
     """Get values so they can be logged under debug before constructing"""
-    file_name = os.getcwd() + '/client.json'
+    google_info = os.getenv('trad_labs_api_google',
+                            '{"client_id":"enter clientid","client_secret":"enter client secret"}')
+    client_id = flask.json.loads(google_info)['client_id']
+    client_secret = flask.json.loads(google_info)['client_secret']
+
     redirect_uri = url_for('google_callback', _external=True)
-    LOGGER.debug('secret file path: %s; redirect_uri: %s', file_name, redirect_uri)
+    LOGGER.debug('client_id: %s; redirect_uri: %s', client_id, redirect_uri)
 
     # Create the flow
-    flow = client.flow_from_clientsecrets(file_name,
-                                          scope='https://www.googleapis.com/auth/userinfo.profile '
-                                                'https://www.googleapis.com/auth/userinfo.email',
-                                          redirect_uri=redirect_uri)
+    # flow = client.flow_from_clientsecrets(file_name,
+    #                                       scope='https://www.googleapis.com/auth/userinfo.profile '
+    #                                             'https://www.googleapis.com/auth/userinfo.email',
+    #                                       redirect_uri=redirect_uri)
+    flow = client.OAuth2WebServerFlow(client_id=client_id,
+                                      client_secret=client_secret,
+                                      scope='https://www.googleapis.com/auth/userinfo.profile '
+                                            'https://www.googleapis.com/auth/userinfo.email',
+                                      auth_uri="https://accounts.google.com/o/oauth2/auth",
+                                      token_uri="https://accounts.google.com/o/oauth2/token",
+                                      redirect_uri=redirect_uri)
 
     return flow
 
