@@ -15,6 +15,7 @@ import flask.json
 from flask import g
 
 
+
 # Import our common code
 import flaskApp.config
 
@@ -124,9 +125,11 @@ def db_tests():
     db_query("select sleep(6);", ())
     success_count += 1
 
-    # III. Test SP
-    # B. SP Not exist
-    db_stored_procedure('health_check', ('unit test', 43))
+    # ###################################################################################################
+    # IV. Test Stored Procedure
+    # ###################################################################################################
+    db_stored_procedure('db_wait', (6, ))
+    success_count += 1
 
     return "%d" % success_count
 
