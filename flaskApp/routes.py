@@ -5,19 +5,48 @@ __author__ = 'sfblackl'
 import logging
 import time
 import uuid
+import traceback
+import sys
+import socket
 
-from flask import g, request
+from flask import g, request, render_template, url_for
 
 from flaskApp import application
 import flaskApp.health
 import flaskApp.config
 import flaskApp.custom_errors
+import flaskApp.google
+import flaskApp.db
 
 
 
 # Create Logger
 LOGGER = logging.getLogger('tradlabs.api.routes')
 LOGGER.setLevel(flaskApp.config.LOG_LEVEL_ROUTE)
+
+################################################################################
+# WWW
+################################################################################
+@application.route('/tradlabs/home')
+def home():
+    """Main Home Page"""
+    login_uri = url_for('google_login', _external=True)
+    page = render_template('home.html', login_uri=login_uri)
+    return page
+
+################################################################################
+# Identity
+################################################################################
+@application.route('/tradlabs/login')
+def google_login():
+    """Build redirect request to identity provider"""
+    return flaskApp.google.google_login()
+
+@application.route('/tradlabs/v1/google_callback')
+def google_callback():
+    """Handle redirection back from identity provider via user's browser"""
+    LOGGER.debug('Root: %s', application.root_path)
+    return flaskApp.google.google_callback()
 
 
 ################################################################################
@@ -42,8 +71,16 @@ def test_500():
 def test_403():
     """Generates 403 Error.  ToDo: Replace this with valid test"""
     LOGGER.debug('Routing to HTTP 403 Error')
-    return flaskApp.custom_errors.error_formatter(code=40301)
+    return flaskApp.custom_errors.error_formatter(code='403')
 
+@application.route('/tradlabs/v1/test/db', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def test_db():
+    """Basic Test of DB Query since we don't yet have this working."""
+    LOGGER.debug('Implementing DB Test')
+    host = socket.gethostname().lower()
+    db_count = flaskApp.db.db_query("select count(*) from health where system=%s", (host,))[0][0]
+
+    return str(db_count)
 ################################################################################
 # LOG HTTP REQUESTS
 ################################################################################
@@ -67,11 +104,12 @@ def http_log_entry(response=None, exception=None):
 
     # Log Entry
     if exception is None:
-        LOGGER.info('HTTP|%s|%d|%s|%s|%s|%s', http_status, status_code, request.method,
-                    request.path, '{0:0,}'.format(diff), str(exception))
+        LOGGER.info('HTTP|%s|%d|%s|%s|%s|', http_status, status_code, request.method,
+                    request.path, '{0:0,}'.format(diff))
     else:
         LOGGER.info('HTTP|%s|%d|%s|%s|%s|%s', http_status, status_code, request.method,
-                    request.path, '{0:0,}'.format(diff), str(exception))
+                    request.path, '{0:0,}'.format(diff),
+                    traceback.format_exception_only(sys.exc_info()[0], sys.exc_info()[1]))
 
 
 @application.before_request
@@ -81,7 +119,7 @@ def before_request():
     g.env = flaskApp.config.ENV
 
     # Use incoming Request ID if provided
-    request_id = request.headers.get('X_Request_ID', uuid.uuid1())
+    request_id = str(request.headers.get('X_Request_ID', uuid.uuid1()))
     g.request_id = request_id
 
 @application.after_request

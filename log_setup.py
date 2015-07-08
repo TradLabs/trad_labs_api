@@ -6,6 +6,7 @@ __author__ = 'sfblackl'
 # SetUp Logging
 ################################################################################
 import logging
+
 import logging.handlers
 
 import flaskApp.loggly_class
@@ -15,7 +16,7 @@ import flaskApp.config
 def start_log(loggly=True):
     """Starts Logging to Occur"""
     logger = logging.getLogger('tradlabs')
-    logger.setLevel(flaskApp.config.LOG_LEVEL_TOP)
+    logger.setLevel(flaskApp.config.LOG_LEVEL)
 
     # File Handler
     h_file = logging.handlers.TimedRotatingFileHandler(flaskApp.config.LOG_PATH + 'api.log',
@@ -30,5 +31,5 @@ def start_log(loggly=True):
     logger.addHandler(h_console)
 
     if loggly:
-        h_loggly = flaskApp.loggly_class.HTTPSHandler(flaskApp.config.LOGGY_URI)
+        h_loggly = flaskApp.loggly_class.HTTPSHandler(flaskApp.config.LOGGLY_URI)
         logger.addHandler(h_loggly)

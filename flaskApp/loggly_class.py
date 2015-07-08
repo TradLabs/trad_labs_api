@@ -24,10 +24,12 @@ def bg_cb(sess, resp):
 #     else:
 #         return record.getMessage()
 
+
 def generate_header():
     """ Creates custom tags to go over header """
     env = getattr(g, 'env', 'unknown')
     return {'X-LOGGLY-TAG': env}
+
 
 class HTTPSHandler(logging.Handler):
     """ Stolen from Loggy's default class """

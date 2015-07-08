@@ -2,6 +2,7 @@
   <dictionary name="sfblackl">
     <words>
       <w>loggly</w>
+      <w>nosetests</w>
       <w>pylint</w>
       <w>sfblackl</w>
       <w>tradlabs</w>

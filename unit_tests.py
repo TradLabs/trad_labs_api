@@ -41,22 +41,32 @@ class OtherItems(unittest.TestCase):
         with application.test_client(self) as tc1:
             response = tc1.get('/tradlabs/v1/403')
             self.assertEqual(response.status_code, 403)
-            self.assertEqual(flask.json.loads(response.data)['code'], 'TLA-40301')
+            self.assertEqual(flask.json.loads(response.data)['code'], '403')
 
     def test_404(self):
         """Ensure un trapped error correctly reports out status and code"""
         with application.test_client(self) as tc1:
             response = tc1.get('/tradlabs/v1/404')
             self.assertEqual(response.status_code, 404)
-            self.assertEqual(flask.json.loads(response.data)['code'], 'TLA-40401')
+            self.assertEqual(flask.json.loads(response.data)['code'], '404')
 
     def test_500_prod(self):
         """Ensure un trapped error correctly reports out status and code"""
         with application.test_client(self) as tc1:
             response = tc1.get('/tradlabs/v1/500')
             self.assertEqual(response.status_code, 500)
-            self.assertEqual(flask.json.loads(response.data)['code'], 'TLA-50001')
+            self.assertEqual(flask.json.loads(response.data)['code'], '500_01')
 
+class Random(unittest.TestCase):
+    """
+        Test the DB to hell
+    """
+
+    def test_db_query(self):
+        """Basic Test of db"""
+        with application.test_client(self) as tc1:
+            response = tc1.get('/tradlabs/v1/test/db')
+            self.assertEqual(response.status_code, 200)
 
 # Allows to file to be run directly
 if __name__ == '__main__':
