@@ -10,10 +10,12 @@ import logging
 from flask import redirect, request, url_for
 import flask.json
 from oauth2client import client
+
 import requests
 
 import flaskApp.config
 import flaskApp.custom_errors
+
 
 
 
@@ -34,10 +36,6 @@ def google_flow():
     LOGGER.debug('client_id: %s; redirect_uri: %s', client_id, redirect_uri)
 
     # Create the flow
-    # flow = client.flow_from_clientsecrets(file_name,
-    #                                       scope='https://www.googleapis.com/auth/userinfo.profile '
-    #                                             'https://www.googleapis.com/auth/userinfo.email',
-    #                                       redirect_uri=redirect_uri)
     flow = client.OAuth2WebServerFlow(client_id=client_id,
                                       client_secret=client_secret,
                                       scope='https://www.googleapis.com/auth/userinfo.profile '
