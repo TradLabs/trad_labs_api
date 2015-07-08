@@ -16,6 +16,7 @@ from flask import g
 
 
 
+
 # Import our common code
 import flaskApp.config
 
@@ -51,6 +52,7 @@ def db_tests():
 
     # ###################################################################################################
     # I. Test Utility
+    # 4 Tests
     # ###################################################################################################
     # A. Valid If Null
     if if_null(None, 'other') == 'other':
@@ -75,9 +77,14 @@ def db_tests():
         success_count += 1
     # else:
     #     LOGGER.error('Format Failed, was: %s', tmp)
+    try:
+        format_statement("string: %s", 666, False)
+    except Exception:
+        success_count += 1
 
     # ###################################################################################################
     # II. Connection Bad
+    # 4 Tests
     # ###################################################################################################
     # A. Bad Config
     try:
@@ -105,29 +112,34 @@ def db_tests():
 
     # ###################################################################################################
     # III. Test Query
+    # 3 Tests
     # ###################################################################################################
-    # A. Basic Query
-    db_count = db_query("select count(*) from health where app=%s", ('does not exist',))[0][0]
-    if db_count == 0:
-        success_count += 1
-
-    # B. Bad Query
+    # A. Bad Query
     try:
         db_query("select count(*) from health2 where app=%s", ('does not exist',))[0][0]
     except Exception:
         success_count += 1
 
-    # C. No Result Query
-    db_query("update health set system='tbd' where system='not tbd'", ())
-    success_count += 1
-
-    # D. Long Query
+    # B. No Result & Long Query
     db_query("select sleep(6);", ())
     success_count += 1
 
+    # C. Basic Query
+    db_count = db_query("select count(*) from health where app=%s", ('does not exist',))[0][0]
+    if db_count == 0:
+        success_count += 1
+
     # ###################################################################################################
     # IV. Test Stored Procedure
+    # 2 Tests
     # ###################################################################################################
+    # A. Bad Query
+    try:
+        db_stored_procedure('no_existing_sp', (6, ))
+    except Exception:
+        success_count += 1
+
+    # B. No Result & Long Query
     db_stored_procedure('db_wait', (6, ))
     success_count += 1
 

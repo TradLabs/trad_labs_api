@@ -51,6 +51,14 @@ class OtherItems(unittest.TestCase):
             self.assertEqual(response.status_code, 404)
             self.assertEqual(flask.json.loads(response.data)['code'], '404')
 
+    def test_418(self):
+        """Ensure un trapped code works"""
+        with application.test_client(self) as tc1:
+            response = tc1.get('/tradlabs/v1/418')
+            self.assertEqual(response.status_code, 418)
+            self.assertEqual(flask.json.loads(response.data)['code'], '418')
+            self.assertEqual(flask.json.loads(response.data)['message'], 'No Message Exists')
+
     def test_500_prod(self):
         """Ensure un trapped error correctly reports out status and code"""
         with application.test_client(self) as tc1:

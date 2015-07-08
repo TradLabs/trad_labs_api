@@ -18,6 +18,7 @@ import flaskApp.google
 import flaskApp.db
 
 
+
 # Create Logger
 LOGGER = logging.getLogger('tradlabs.api.routes')
 LOGGER.setLevel(flaskApp.config.LOG_LEVEL_ROUTE)
@@ -63,13 +64,6 @@ def health():
 ################################################################################
 # TESTING
 ################################################################################
-@application.route('/tradlabs/v1/500', methods=['GET', 'POST', 'PUT', 'DELETE'])
-def test_500():
-    """Forces error to validate error message is correct"""
-    LOGGER.debug('Routing to HTTP 500 Error')
-    print(1/0)
-
-
 @application.route('/tradlabs/v1/403', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def test_403():
     """Generates 403 Error.  ToDo: Replace this with valid test"""
@@ -77,11 +71,24 @@ def test_403():
     return flaskApp.custom_errors.error_formatter(code='403')
 
 
+@application.route('/tradlabs/v1/418', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def test_418():
+    """Generates 418 Error.  Which doesn't exist"""
+    LOGGER.debug('Routing to HTTP 418 Error')
+    return flaskApp.custom_errors.error_formatter(code='418')
+
+
+@application.route('/tradlabs/v1/500', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def test_500():
+    """Forces error to validate error message is correct"""
+    LOGGER.debug('Routing to HTTP 500 Error')
+    print(1/0)
+
+
 @application.route('/tradlabs/v1/test/db', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def test_db():
     """Test of various DB Functions"""
     LOGGER.debug('Routing to DB Test')
-
     return flaskApp.db.db_tests()
 
 
