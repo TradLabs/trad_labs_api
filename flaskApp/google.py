@@ -15,6 +15,7 @@ import flaskApp.config
 import flaskApp.custom_errors
 
 
+
 # Create Logger
 LOGGER = logging.getLogger('tradlabs.api.routes')
 LOGGER.setLevel(flaskApp.config.LOG_LEVEL_GOOGLE)
@@ -23,12 +24,7 @@ LOGGER.setLevel(flaskApp.config.LOG_LEVEL_GOOGLE)
 def google_flow():
     """Get values so they can be logged under debug before constructing"""
     file_name = os.getcwd() + '/client.json'
-    try:
-        redirect_uri = url_for('google_callback', _external=True)
-    except Exception:
-        LOGGER.error("Exception getting url_for callback: %s",
-                     traceback.format_exception_only(sys.exc_info()[0], sys.exc_info()[1]))
-        redirect_uri = 'https://ci.api.betarat.com/tradlabs/v1/google_callback'
+    redirect_uri = url_for('google_callback', _external=True)
     LOGGER.debug('secret file path: %s; redirect_uri: %s', file_name, redirect_uri)
 
     # Create the flow
@@ -38,6 +34,23 @@ def google_flow():
                                           redirect_uri=redirect_uri)
 
     return flow
+
+
+def google_fetch_user_info(access_token):
+    # Call Google to get credentials
+    url = 'https://www.googleapis.com/userinfo/v2/me'
+    headers = {'Authorization': 'Bearer ' + access_token}
+    try:
+        response = requests.get(url, headers=headers)
+
+    except Exception:
+        LOGGER.error("Exception getting user info: %s",
+                     traceback.format_exception_only(sys.exc_info()[0], sys.exc_info()[1]))
+        return flaskApp.custom_errors.error_formatter(code='500_02', display_format='html',
+                                                      details=traceback.format_exception_only(sys.exc_info()[0],
+                                                                                              sys.exc_info()[1]))
+
+    return response.text
 
 
 ################################################################################
@@ -55,7 +68,7 @@ def google_login():
 def google_callback():
     """Handle the redirect request from consumers browser containing information from identity provider"""
 
-    # We can get either error or code
+    # I. Get Inputs and Handle Error returned
     error_message = request.args.get('error')
     auth_code = request.args.get('code', '')
     LOGGER.debug('Google Return Error: %s, Code: %s', str(error_message), auth_code)
@@ -64,7 +77,7 @@ def google_callback():
     if error_message is not None:
         return flaskApp.custom_errors.error_formatter(code='403_opt_out', display_format='html', details=error_message)
 
-    # Call Google to get credentials
+    # II. Call Google to get credentials
     # If no success return error message
     try:
         flow = google_flow()
@@ -77,17 +90,5 @@ def google_callback():
                                                       details=traceback.format_exception_only(sys.exc_info()[0],
                                                                                               sys.exc_info()[1]))
 
-    # Call Google to get credentials
-    url = 'https://www.googleapis.com/userinfo/v2/me'
-    headers = {'Authorization': 'Bearer ' + str(credentials.access_token)}
-    try:
-        response = requests.get(url, headers=headers)
-
-    except Exception:
-        LOGGER.error("Exception getting user info: %s",
-                     traceback.format_exception_only(sys.exc_info()[0], sys.exc_info()[1]))
-        return flaskApp.custom_errors.error_formatter(code='500_02', display_format='html',
-                                                      details=traceback.format_exception_only(sys.exc_info()[0],
-                                                                                              sys.exc_info()[1]))
-
-    return response.text
+    # III. Use credentials to get information
+    return google_fetch_user_info(str(credentials.access_token))

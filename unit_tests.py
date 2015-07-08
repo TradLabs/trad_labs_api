@@ -11,6 +11,29 @@ import log_setup
 
 log_setup.start_log()
 
+class Google(unittest.TestCase):
+    """Tests for Google Login / Authorize """
+
+    def test_login_redirect(self):
+        """Validate Login Returned redirection to google"""
+        with application.test_client(self) as tc1:
+            response = tc1.get('/tradlabs/login')
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.headers['Location'][:40], 'https://accounts.google.com/o/oauth2/auth'[:40])
+
+    def test_callback_error(self):
+        """Validate Login Returned redirection to google"""
+        with application.test_client(self) as tc1:
+            response = tc1.get('/tradlabs/v1/google_callback?error=UNITTEST')
+            self.assertEqual(response.status_code, 403)
+            self.assertIn('403_opt_out', str(response.data))
+
+    def test_callback_bad_code(self):
+        """Validate Login Returned redirection to google"""
+        with application.test_client(self) as tc1:
+            response = tc1.get('/tradlabs/v1/google_callback?code=BAD_CODE')
+            self.assertEqual(response.status_code, 500)
+            self.assertIn('500_02', str(response.data))
 
 class OtherItems(unittest.TestCase):
     """Universal Unit Tests for REST Service"""
